@@ -14,12 +14,19 @@ struct ClipboardSnippet: Identifiable {
     let timestamp: Date
 }
 
-
 struct ContentView: View {
+    @ObservedObject var database = ClipboardDatabase.shared
     @State private var searchText: String = ""
-    @State private var snippets: [ClipboardSnippet] = []
 
     var filteredSnippets: [ClipboardSnippet] {
+        let snippets = database.clipboardItems.map { item in
+            ClipboardSnippet(
+                id: UUID(),
+                content: item.content,
+                appName: item.appName ?? "Unknown",
+                timestamp: parseTimestamp(item.timestamp)
+            )
+        }
         if searchText.isEmpty {
             return snippets
         } else {
@@ -69,8 +76,18 @@ struct ContentView: View {
 
             Divider()
             Spacer()
+        }.onAppear {
+            database.clipboardItems = database.fetchClipboardItems()
         }
     }
+    
+    private func parseTimestamp(_ timestampString: String) -> Date {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        return formatter.date(from: timestampString) ?? Date()
+    }
+    
 }
 
 //#Preview {
