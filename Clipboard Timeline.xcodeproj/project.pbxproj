@@ -34,9 +34,22 @@
 		02CEB3662DEA23E3001E1C9F /* libsqlite3.0.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libsqlite3.0.tbd; path = usr/lib/libsqlite3.0.tbd; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		02CEB36A2DEA4663001E1C9F /* Exceptions for "Clipboard Timeline" folder in "Clipboard Timeline" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				"Clipboard-Timeline-Info.plist",
+			);
+			target = 02CEB3192DE9DD14001E1C9F /* Clipboard Timeline */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		02CEB31C2DE9DD14001E1C9F /* Clipboard Timeline */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				02CEB36A2DEA4663001E1C9F /* Exceptions for "Clipboard Timeline" folder in "Clipboard Timeline" target */,
+			);
 			path = "Clipboard Timeline";
 			sourceTree = "<group>";
 		};
@@ -420,6 +433,8 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Clipboard-Timeline-Info.plist";
+				INFOPLIST_KEY_LSUIElement = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -447,6 +462,8 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Clipboard-Timeline-Info.plist";
+				INFOPLIST_KEY_LSUIElement = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
