@@ -1,12 +1,15 @@
 {
-  "colors" : [
+  "images" : [
     {
-      "filename" : "ChatGPT Image May 30, 2025, 07_44_05 PM.png",
+      "filename" : "logo.png",
       "idiom" : "universal"
     }
   ],
   "info" : {
     "author" : "xcode",
     "version" : 1
+  },
+  "properties" : {
+    "localizable" : true
   }
 }

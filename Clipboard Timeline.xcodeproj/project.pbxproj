@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		02CEB3672DEA23E3001E1C9F /* libsqlite3.0.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 02CEB3662DEA23E3001E1C9F /* libsqlite3.0.tbd */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		02CEB3292DE9DD16001E1C9F /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -27,6 +31,7 @@
 		02CEB31A2DE9DD14001E1C9F /* Clipboard Timeline.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Clipboard Timeline.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		02CEB3282DE9DD16001E1C9F /* Clipboard TimelineTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Clipboard TimelineTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		02CEB3322DE9DD16001E1C9F /* Clipboard TimelineUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Clipboard TimelineUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		02CEB3662DEA23E3001E1C9F /* libsqlite3.0.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libsqlite3.0.tbd; path = usr/lib/libsqlite3.0.tbd; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -52,6 +57,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				02CEB3672DEA23E3001E1C9F /* libsqlite3.0.tbd in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -78,6 +84,7 @@
 				02CEB31C2DE9DD14001E1C9F /* Clipboard Timeline */,
 				02CEB32B2DE9DD16001E1C9F /* Clipboard TimelineTests */,
 				02CEB3352DE9DD16001E1C9F /* Clipboard TimelineUITests */,
+				02CEB3652DEA23E3001E1C9F /* Frameworks */,
 				02CEB31B2DE9DD14001E1C9F /* Products */,
 			);
 			sourceTree = "<group>";
@@ -90,6 +97,14 @@
 				02CEB3322DE9DD16001E1C9F /* Clipboard TimelineUITests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		02CEB3652DEA23E3001E1C9F /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				02CEB3662DEA23E3001E1C9F /* libsqlite3.0.tbd */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -195,6 +210,9 @@
 			);
 			mainGroup = 02CEB3112DE9DD14001E1C9F;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				02CEB3682DEA2935001E1C9F /* XCRemoteSwiftPackageReference "SQLite" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 02CEB31B2DE9DD14001E1C9F /* Products */;
 			projectDirPath = "";
@@ -398,7 +416,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 4426S2SFBM;
+				DEVELOPMENT_TEAM = FZS86W2D4N;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -425,7 +443,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 4426S2SFBM;
+				DEVELOPMENT_TEAM = FZS86W2D4N;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -551,6 +569,17 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		02CEB3682DEA2935001E1C9F /* XCRemoteSwiftPackageReference "SQLite" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/stephencelis/SQLite.swift";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.15.3;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
 	};
 	rootObject = 02CEB3122DE9DD14001E1C9F /* Project object */;
 }

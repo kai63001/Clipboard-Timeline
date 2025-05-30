@@ -4,14 +4,73 @@
 //
 //  Created by romeo on 30/5/2568 BE.
 //
-
+import Cocoa
 import SwiftUI
 
 @main
 struct Clipboard_TimelineApp: App {
-    var body: some Scene {
-        WindowGroup {
-            ContentView()
+    @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+       var body: some Scene {
+           Settings {
+               EmptyView()
+           }
+       }
+}
+
+class AppDelegate: NSObject, NSApplicationDelegate {
+    var statusItem: NSStatusItem!
+    var popover: NSPopover!
+    var clipboardMonitor: ClipboardMonitor?
+    
+    func applicationDidFinishLaunching(_ notification: Notification) {
+        // init clipboard Monitor
+        clipboardMonitor = ClipboardMonitor()
+        
+        // Status Bar Item
+        statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
+        if let button = statusItem.button {
+            button.image = resizedIcon
+            button.action = #selector(togglePopover(_:))
+        }
+        
+        popover = NSPopover()
+        popover.contentSize = NSSize(width: 350, height: 500)
+        popover.behavior = .transient
+        popover.contentViewController = NSHostingController(rootView: ContentView())
+    }
+    
+    @objc func togglePopover(_ sender: AnyObject?) {
+        if let button = statusItem.button {
+            if popover.isShown {
+                popover.performClose(sender)
+            } else {
+                popover.show(relativeTo: button.bounds, of: button, preferredEdge: .minY)
+                popover.contentViewController?.view.window?.makeKey()
+            }
+        }
+    }
+    
+    private var resizedIcon: NSImage {
+        if let loadedImage = NSImage(named: "logo") {
+            let ratio = loadedImage.size.height / loadedImage.size.width
+            loadedImage.size.height = 29
+            loadedImage.size.width = 21 / ratio
+            return loadedImage
+        } else {
+            return NSImage()
         }
     }
 }
+
+//class AppDelegate: NSObject, NSApplicationDelegate {
+//    static private(set) var instance: AppDelegate!
+//    lazy var statusBarItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
+//    let menu = ApplicationMenu()
+//
+//    func applicationDidFinishLaunching(_ aNotification: Notification) {
+//        AppDelegate.instance = self
+//        statusBarItem.button?.image = NSImage(named: NSImage.Name("logo"))
+//        statusBarItem.button?.imagePosition = .imageLeading
+//        statusBarItem.menu = menu.createMenu()
+//    }
+//}
