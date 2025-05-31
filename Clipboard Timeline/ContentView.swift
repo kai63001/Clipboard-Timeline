@@ -29,13 +29,21 @@ struct ContentView: View {
                 timestamp: parseTimestamp(item.timestamp)
             )
         }
-        if searchText.isEmpty {
-            return snippets
-        } else {
-            return snippets.filter {
-                $0.content.localizedCaseInsensitiveContains(searchText)
-            }
+        return snippets
+    }
+    
+    var yesterdayClipboardSnippets: [ClipboardSnippet] {
+        let snippets = database.fetchClipboardItems(type: "yesterday").map {
+            ClipboardSnippet(
+                id: UUID(),
+                content: $0.content,
+                appName: $0.appName ?? "Unknown",
+                appBundleId: $0.appBundleId ?? "Unknown",
+                timestamp: parseTimestamp($0.timestamp)
+            )
         }
+        
+        return snippets
     }
 
     var body: some View {
@@ -72,8 +80,17 @@ struct ContentView: View {
                         SnippetRow(snippet: snippet)
                     }
                 }
+                Section(
+                    header: Text("Yesterday").font(.caption).foregroundColor(
+                        .secondary
+                    )
+                ) {
+                    ForEach(yesterdayClipboardSnippets) { snippet in
+                        SnippetRow(snippet: snippet)
+                    }
+                }
             }
-            .listStyle(PlainListStyle())
+            .listStyle(SidebarListStyle())
             .frame(minHeight: 300)
 
             Spacer()

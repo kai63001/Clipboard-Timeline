@@ -56,7 +56,9 @@ class ClipboardDatabase: ObservableObject {
                 content TEXT,
                 timestamp TEXT,
                 app_name TEXT,
-                app_bundle_id TEXT
+                app_bundle_id TEXT,
+                record_id TEXT UNIQUE,
+                synced INTEGER DEFAULT 0
             );
             """
         var createTableStatement: OpaquePointer?
@@ -186,7 +188,7 @@ class ClipboardDatabase: ObservableObject {
         deleteSelectedIDs(listDuplicateID)
 
         let insertStatementString =
-            "INSERT INTO clipboard_history (content, timestamp, app_name, app_bundle_id) VALUES (?, datetime('now'), ?, ?);"
+            "INSERT INTO clipboard_history (content, timestamp, app_name, app_bundle_id, record_id) VALUES (?, datetime('now'), ?, ?, ?);"
         var insertStatement: OpaquePointer?
         if sqlite3_prepare_v2(
             db,
@@ -224,6 +226,14 @@ class ClipboardDatabase: ObservableObject {
             } else {
                 sqlite3_bind_null(insertStatement, 3)
             }
+            let recordId = UUID().uuidString
+            sqlite3_bind_text(
+                insertStatement,
+                4,
+                (recordId as NSString).utf8String,
+                -1,
+                nil
+            )
             if sqlite3_step(insertStatement) == SQLITE_DONE {
                 print("Successfully inserted row.")
                 DispatchQueue.main.async {
