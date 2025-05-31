@@ -11,7 +11,7 @@ class ClipboardDatabase: ObservableObject {
             in: .userDomainMask
         )
         let dbURL = urls[0].appendingPathComponent(
-            "ClipboardManager/clipboard.sqlite3"
+            "ClipboardTimeline/clipboard.sqlite3"
         )
         return dbURL.path
     }()
@@ -55,7 +55,8 @@ class ClipboardDatabase: ObservableObject {
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 content TEXT,
                 timestamp TEXT,
-                app_name TEXT
+                app_name TEXT,
+                app_bundle_id TEXT
             );
             """
         var createTableStatement: OpaquePointer?
@@ -76,9 +77,10 @@ class ClipboardDatabase: ObservableObject {
         }
         sqlite3_finalize(createTableStatement)
     }
-    
-    func checkDuplicate(content: String, appName: String?) -> [ClipboardItem] {
-        let checkDuplicate = "SELECT id, content, timestamp, app_name FROM clipboard_history WHERE content = ? AND app_name = ? ORDER BY id DESC LIMIT 10"
+
+    func checkDuplicate(content: String, appBundleId: String?) -> [ClipboardItem] {
+        let checkDuplicate =
+            "SELECT id, content, timestamp, app_name, app_bundle_id FROM clipboard_history WHERE content = ? AND app_bundle_id = ? ORDER BY id DESC LIMIT 10"
         var queryStatement: OpaquePointer?
         var items: [ClipboardItem] = []
         if sqlite3_prepare_v2(
@@ -95,11 +97,11 @@ class ClipboardDatabase: ObservableObject {
                 -1,
                 nil
             )
-            if let appName = appName {
+            if let appBundleId = appBundleId {
                 sqlite3_bind_text(
                     queryStatement,
                     2,
-                    (appName as NSString).utf8String,
+                    (appBundleId as NSString).utf8String,
                     -1,
                     nil
                 )
@@ -117,12 +119,16 @@ class ClipboardDatabase: ObservableObject {
                 let appName = sqlite3_column_text(queryStatement, 3)
                 let appNameString =
                     appName != nil ? String(cString: appName!) : nil
+                let appBundleId = sqlite3_column_text(queryStatement, 4)
+                let appBundleIdString =
+                appBundleId != nil ? String(cString: appBundleId!) : nil
 
                 let item = ClipboardItem(
                     id: id,
                     content: content,
                     timestamp: timestamp,
-                    appName: appNameString
+                    appName: appNameString,
+                    appBundleId: appBundleIdString
                 )
                 items.append(item)
             }
@@ -130,18 +136,19 @@ class ClipboardDatabase: ObservableObject {
             print("SELECT statement could not be prepared.")
         }
         sqlite3_finalize(queryStatement)
-        
+
         return items
     }
-    
+
     func deleteSelectedIDs(_ selectedIDs: [Int64]) {
         for id in selectedIDs {
             deleteClipboardItem(id: id)
         }
     }
-    
+
     func deleteClipboardItem(id: Int64) {
-        let deleteStatementString = "DELETE FROM clipboard_history WHERE id = ?;"
+        let deleteStatementString =
+            "DELETE FROM clipboard_history WHERE id = ?;"
         var deleteStatement: OpaquePointer?
         if sqlite3_prepare_v2(
             db,
@@ -169,19 +176,17 @@ class ClipboardDatabase: ObservableObject {
         sqlite3_finalize(deleteStatement)
     }
 
-    func addClipboardItem(content: String, appName: String?) {
+    func addClipboardItem(content: String, appName: String?, appBundleId: String?) {
         // check duplicate last 10 if it duplicate remove and insert new
-        let listDuplicate = checkDuplicate(content: content, appName: appName)
+        let listDuplicate = checkDuplicate(content: content, appBundleId: appBundleId)
         print("List Duplicate: \(listDuplicate)")
         let listDuplicateID = listDuplicate.map({
             $0.id
         })
         deleteSelectedIDs(listDuplicateID)
-        
-        
-        
+
         let insertStatementString =
-            "INSERT INTO clipboard_history (content, timestamp, app_name) VALUES (?, datetime('now'), ?);"
+            "INSERT INTO clipboard_history (content, timestamp, app_name, app_bundle_id) VALUES (?, datetime('now'), ?, ?);"
         var insertStatement: OpaquePointer?
         if sqlite3_prepare_v2(
             db,
@@ -208,6 +213,17 @@ class ClipboardDatabase: ObservableObject {
             } else {
                 sqlite3_bind_null(insertStatement, 2)
             }
+            if let appBundleId = appBundleId {
+                sqlite3_bind_text(
+                    insertStatement,
+                    3,
+                    (appBundleId as NSString).utf8String,
+                    -1,
+                    nil
+                )
+            } else {
+                sqlite3_bind_null(insertStatement, 3)
+            }
             if sqlite3_step(insertStatement) == SQLITE_DONE {
                 print("Successfully inserted row.")
                 DispatchQueue.main.async {
@@ -226,13 +242,13 @@ class ClipboardDatabase: ObservableObject {
         var query = ""
         if type == "today" {
             query =
-                "SELECT id, content, timestamp, app_name FROM clipboard_history WHERE date(timestamp) = date('now', 'localtime') ORDER BY timestamp DESC;"
+                "SELECT id, content, timestamp, app_name, app_bundle_id FROM clipboard_history WHERE date(timestamp) = date('now', 'localtime') ORDER BY timestamp DESC;"
         } else if type == "yesterday" {
             query =
-                "SELECT id, content, timestamp, app_name FROM clipboard_history WHERE date(timestamp) = date('now', '-1 day', 'localtime') ORDER BY timestamp DESC;"
+                "SELECT id, content, timestamp, app_name, app_bundle_id FROM clipboard_history WHERE date(timestamp) = date('now', '-1 day', 'localtime') ORDER BY timestamp DESC;"
         } else {
             query =
-                "SELECT id, content, timestamp, app_name FROM clipboard_history ORDER BY timestamp DESC;"
+                "SELECT id, content, timestamp, app_name, app_bundle_id FROM clipboard_history ORDER BY timestamp DESC;"
         }
 
         var queryStatement: OpaquePointer?
@@ -255,12 +271,16 @@ class ClipboardDatabase: ObservableObject {
                 let appName = sqlite3_column_text(queryStatement, 3)
                 let appNameString =
                     appName != nil ? String(cString: appName!) : nil
+                let appBundleId = sqlite3_column_text(queryStatement, 4)
+                let appBundleIdString =
+                    appBundleId != nil ? String(cString: appBundleId!) : nil
 
                 let item = ClipboardItem(
                     id: id,
                     content: content,
                     timestamp: timestamp,
-                    appName: appNameString
+                    appName: appNameString,
+                    appBundleId: appBundleIdString
                 )
                 items.append(item)
             }
@@ -277,4 +297,5 @@ struct ClipboardItem: Identifiable {
     let content: String
     let timestamp: String
     let appName: String?
+    let appBundleId: String?
 }

@@ -27,7 +27,9 @@ class ClipboardMonitor {
             changeCount = pasteboard.changeCount
             if let copiedString = pasteboard.string(forType: .string) {
                 let appName = NSWorkspace.shared.frontmostApplication?.localizedName ?? "Unknown"
-                ClipboardDatabase.shared.addClipboardItem(content: copiedString, appName: appName)
+                let bundleID = NSWorkspace.shared.frontmostApplication?.bundleIdentifier ?? "Unknown"
+                print("bundle ID \(bundleID)")
+                ClipboardDatabase.shared.addClipboardItem(content: copiedString, appName: appName, appBundleId: bundleID)
                 print("New clipboard text: \(copiedString) from \(appName)")
             }
         }

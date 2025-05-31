@@ -11,6 +11,7 @@ struct ClipboardSnippet: Identifiable {
     let id: UUID
     let content: String
     let appName: String
+    let appBundleId: String
     let timestamp: Date
 }
 
@@ -24,6 +25,7 @@ struct ContentView: View {
                 id: UUID(),
                 content: item.content,
                 appName: item.appName ?? "Unknown",
+                appBundleId: item.appBundleId ?? "Unknown",
                 timestamp: parseTimestamp(item.timestamp)
             )
         }
