@@ -32,6 +32,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                     ClipboardPopupManager.shared.showPopup()
                 }
             }
+            
+            if event.keyCode == 53 { // 53 = ESC
+                ClipboardPopupManager.shared.closePopup()
+            }
         }
         
         // init clipboard Monitor
