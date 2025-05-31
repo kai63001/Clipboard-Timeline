@@ -10,6 +10,7 @@ import SwiftUI
 
 struct SnippetRow: View {
     let snippet: ClipboardSnippet
+    @ObservedObject var database = ClipboardDatabase.shared
     @State private var isHovering = false
 
     private func appIcon(for appIconBundleId: String) -> NSImage {
@@ -41,6 +42,7 @@ struct SnippetRow: View {
 
                 if isHovering {
                     Button(action: {
+                        database.deleteClipboardItem(id: snippet.id)
                     }) {
                         Image(systemName: "trash")
                             .foregroundColor(.red)

@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct ClipboardSnippet: Identifiable {
-    let id: UUID
+    let id: Int64
     let content: String
     let appName: String
     let appBundleId: String
@@ -22,7 +22,7 @@ struct ContentView: View {
     var filteredSnippets: [ClipboardSnippet] {
         let snippets = database.clipboardItems.map { item in
             ClipboardSnippet(
-                id: UUID(),
+                id: item.id,
                 content: item.content,
                 appName: item.appName ?? "Unknown",
                 appBundleId: item.appBundleId ?? "Unknown",
@@ -35,7 +35,7 @@ struct ContentView: View {
     var yesterdayClipboardSnippets: [ClipboardSnippet] {
         let snippets = database.fetchClipboardItems(type: "yesterday").map {
             ClipboardSnippet(
-                id: UUID(),
+                id: $0.id,
                 content: $0.content,
                 appName: $0.appName ?? "Unknown",
                 appBundleId: $0.appBundleId ?? "Unknown",
