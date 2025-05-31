@@ -74,7 +74,6 @@ struct ContentView: View {
             .listStyle(PlainListStyle())
             .frame(minHeight: 300)
 
-            Divider()
             Spacer()
         }.onAppear {
             database.clipboardItems = database.fetchClipboardItems()
@@ -85,11 +84,13 @@ struct ContentView: View {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
         formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.timeZone = TimeZone(secondsFromGMT: 0)
+        
         return formatter.date(from: timestampString) ?? Date()
     }
     
 }
-
+//
 //#Preview {
 //    ContentView()
 //}
