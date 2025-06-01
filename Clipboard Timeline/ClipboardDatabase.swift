@@ -80,7 +80,9 @@ class ClipboardDatabase: ObservableObject {
         sqlite3_finalize(createTableStatement)
     }
 
-    func checkDuplicate(content: String, appBundleId: String?) -> [ClipboardItem] {
+    func checkDuplicate(content: String, appBundleId: String?)
+        -> [ClipboardItem]
+    {
         let checkDuplicate =
             "SELECT id, content, timestamp, app_name, app_bundle_id FROM clipboard_history WHERE content = ? AND app_bundle_id = ? ORDER BY id DESC LIMIT 10"
         var queryStatement: OpaquePointer?
@@ -123,7 +125,7 @@ class ClipboardDatabase: ObservableObject {
                     appName != nil ? String(cString: appName!) : nil
                 let appBundleId = sqlite3_column_text(queryStatement, 4)
                 let appBundleIdString =
-                appBundleId != nil ? String(cString: appBundleId!) : nil
+                    appBundleId != nil ? String(cString: appBundleId!) : nil
 
                 let item = ClipboardItem(
                     id: id,
@@ -178,9 +180,16 @@ class ClipboardDatabase: ObservableObject {
         sqlite3_finalize(deleteStatement)
     }
 
-    func addClipboardItem(content: String, appName: String?, appBundleId: String?) {
+    func addClipboardItem(
+        content: String,
+        appName: String?,
+        appBundleId: String?
+    ) {
         // check duplicate last 10 if it duplicate remove and insert new
-        let listDuplicate = checkDuplicate(content: content, appBundleId: appBundleId)
+        let listDuplicate = checkDuplicate(
+            content: content,
+            appBundleId: appBundleId
+        )
         print("List Duplicate: \(listDuplicate)")
         let listDuplicateID = listDuplicate.map({
             $0.id
@@ -299,6 +308,58 @@ class ClipboardDatabase: ObservableObject {
         }
         sqlite3_finalize(queryStatement)
         return items
+    }
+
+    func searchClipboardItems(content: String) -> [ClipboardItem] {
+        let query =
+            "SELECT id, content, timestamp, app_name, app_bundle_id FROM clipboard_history WHERE content LIKE ? ORDER BY timestamp DESC;"
+        var searchStatement: OpaquePointer?
+        var searchResults: [ClipboardItem] = []
+        if sqlite3_prepare_v2(
+            db,
+            query,
+            -1,
+            &searchStatement,
+            nil
+        ) == SQLITE_OK {
+            sqlite3_bind_text(
+                searchStatement,
+                1,
+                (content as NSString).utf8String,
+                -1,
+                nil
+            )
+            while sqlite3_step(searchStatement) == SQLITE_ROW {
+                let id = sqlite3_column_int64(searchStatement, 0)
+                let content = String(
+                    cString: sqlite3_column_text(searchStatement, 1)
+                )
+                let timestamp = String(
+                    cString: sqlite3_column_text(searchStatement, 2)
+                )
+                let appName = sqlite3_column_text(searchStatement, 3)
+                let appNameString =
+                    appName != nil ? String(cString: appName!) : nil
+                let appBundleId = sqlite3_column_text(searchStatement, 4)
+                let appBundleIdString =
+                    appBundleId != nil ? String(cString: appBundleId!) : nil
+
+                let item = ClipboardItem(
+                    id: id,
+                    content: content,
+                    timestamp: timestamp,
+                    appName: appNameString,
+                    appBundleId: appBundleIdString
+                )
+                
+                searchResults.append(item)
+            }
+        } else {
+            print("SELECT statement could not be prepared.")
+        }
+        sqlite3_finalize(searchStatement)
+        
+        return searchResults
     }
 }
 
