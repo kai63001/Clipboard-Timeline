@@ -53,6 +53,7 @@ class ClipboardDatabase: ObservableObject {
         let createTableString = """
             CREATE TABLE IF NOT EXISTS clipboard_history (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
+                alias TEXT,
                 content TEXT,
                 timestamp TEXT,
                 app_name TEXT,

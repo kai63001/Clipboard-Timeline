@@ -18,6 +18,9 @@ struct ClipboardSnippet: Identifiable {
 struct ContentView: View {
     @ObservedObject var database = ClipboardDatabase.shared
     @State private var searchText: String = ""
+    @State private var isExpanded = false
+    @State private var selected = "Today"
+    let items = ["Today", "Yesterday", "All"]
 
     var filteredSnippets: [ClipboardSnippet] {
         let snippets = database.clipboardItems.map { item in
@@ -31,20 +34,20 @@ struct ContentView: View {
         }
         return snippets
     }
-    
-    var yesterdayClipboardSnippets: [ClipboardSnippet] {
-        let snippets = database.fetchClipboardItems(type: "yesterday").map {
-            ClipboardSnippet(
-                id: $0.id,
-                content: $0.content,
-                appName: $0.appName ?? "Unknown",
-                appBundleId: $0.appBundleId ?? "Unknown",
-                timestamp: parseTimestamp($0.timestamp)
-            )
-        }
-        
-        return snippets
-    }
+
+    //    var yesterdayClipboardSnippets: [ClipboardSnippet] {
+    //        let snippets = database.fetchClipboardItems(type: "yesterday").map {
+    //            ClipboardSnippet(
+    //                id: $0.id,
+    //                content: $0.content,
+    //                appName: $0.appName ?? "Unknown",
+    //                appBundleId: $0.appBundleId ?? "Unknown",
+    //                timestamp: parseTimestamp($0.timestamp)
+    //            )
+    //        }
+    //
+    //        return snippets
+    //    }
 
     var body: some View {
         VStack {
@@ -71,24 +74,61 @@ struct ContentView: View {
 
             // Snippet List
             List {
-                Section(
-                    header: Text("Today").font(.caption).foregroundColor(
-                        .secondary
-                    )
-                ) {
+                VStack(alignment: .leading, spacing: 0) {
+                    Button(action: {
+                        withAnimation { isExpanded.toggle() }
+                    }) {
+                        HStack(spacing: 0) {
+                            Text("\(selected) (16)")
+                                .foregroundColor(.primary)
+
+                            Image(systemName: isExpanded ? "chevron.up" : "chevron.down")
+                                .foregroundColor(.gray)
+                        }
+                        .padding(.horizontal, 0)
+                        .padding(.vertical, 0)
+                        .fixedSize()
+                    }
+                    .buttonStyle(.plain)
+                    if isExpanded {
+                        VStack(alignment: .leading, spacing: 4) {
+                            ForEach(items, id: \.self) { item in
+                                Button(action: {
+                                    selected = item
+                                    isExpanded = false
+                                }) {
+                                    Text(item)
+                                        .foregroundColor(.primary)
+                                        .padding(.horizontal, 12)
+                                        .padding(.vertical, 4)
+                                        .background(
+                                            Color(NSColor.windowBackgroundColor)
+                                        )
+                                        .cornerRadius(4)
+                                        .frame(
+                                            maxWidth: .infinity,
+                                            alignment: .leading
+                                        )
+                                }
+                                .buttonStyle(PlainButtonStyle())
+                            }
+                        }
+                    }
+                }
+
+                Section() {
                     ForEach(filteredSnippets) { snippet in
                         SnippetRow(snippet: snippet)
                     }
                 }
-                Section(
-                    header: Text("Yesterday").font(.caption).foregroundColor(
-                        .secondary
-                    )
-                ) {
-                    ForEach(yesterdayClipboardSnippets) { snippet in
-                        SnippetRow(snippet: snippet)
-                    }
-                }
+                //                Section( header: Text("Yesterday").font(.caption).foregroundColor(
+                //                        .secondary
+                //                    )
+                //                ) {
+                //                    ForEach(yesterdayClipboardSnippets) { snippet in
+                //                        SnippetRow(snippet: snippet)
+                //                    }
+                //                }
             }
             .listStyle(SidebarListStyle())
             .frame(minHeight: 300)
@@ -98,16 +138,16 @@ struct ContentView: View {
             database.clipboardItems = database.fetchClipboardItems()
         }
     }
-    
+
     private func parseTimestamp(_ timestampString: String) -> Date {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
         formatter.locale = Locale(identifier: "en_US_POSIX")
         formatter.timeZone = TimeZone(secondsFromGMT: 0)
-        
+
         return formatter.date(from: timestampString) ?? Date()
     }
-    
+
 }
 //
 //#Preview {
