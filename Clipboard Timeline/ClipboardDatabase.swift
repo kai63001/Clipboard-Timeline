@@ -266,9 +266,14 @@ class ClipboardDatabase: ObservableObject {
         } else if type == "yesterday" {
             query =
                 "SELECT id, content, timestamp, app_name, app_bundle_id FROM clipboard_history WHERE date(timestamp) = date('now', '-1 day', 'localtime') ORDER BY timestamp DESC;"
-        } else {
+        } else if type == "all" {
             query =
                 "SELECT id, content, timestamp, app_name, app_bundle_id FROM clipboard_history ORDER BY timestamp DESC;"
+        } else {
+            //            query =
+            //                "SELECT id, content, timestamp, app_name, app_bundle_id FROM clipboard_history ORDER BY timestamp DESC;"
+            query =
+                "SELECT id, content, timestamp, app_name, app_bundle_id FROM clipboard_history WHERE date(timestamp) = date('now', 'localtime') ORDER BY timestamp DESC;"
         }
 
         var queryStatement: OpaquePointer?
@@ -352,14 +357,14 @@ class ClipboardDatabase: ObservableObject {
                     appName: appNameString,
                     appBundleId: appBundleIdString
                 )
-                
+
                 searchResults.append(item)
             }
         } else {
             print("SELECT statement could not be prepared.")
         }
         sqlite3_finalize(searchStatement)
-        
+
         return searchResults
     }
 }

@@ -96,6 +96,7 @@ struct ContentView: View {
                                 Button(action: {
                                     selected = item
                                     isExpanded = false
+                                    loadClipboardItems()
                                 }) {
                                     Text(item)
                                         .foregroundColor(.primary)
@@ -135,8 +136,13 @@ struct ContentView: View {
 
             Spacer()
         }.onAppear {
-            database.clipboardItems = database.fetchClipboardItems()
+            loadClipboardItems()
         }
+    }
+
+    private func loadClipboardItems() {
+        let type = selected.lowercased()
+        database.clipboardItems = database.fetchClipboardItems(type: type)
     }
 
     private func parseTimestamp(_ timestampString: String) -> Date {
